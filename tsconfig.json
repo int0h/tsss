@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "es2018",
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "inlineSources": true,
+        "inlineSourceMap": true,
+    },
+    "include": ["./index.ts"]
+}
