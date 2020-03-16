@@ -1,7 +1,7 @@
 import {Configuration} from 'webpack';
 import path from 'path';
 
-export const webpackConfig: Configuration = {
+export const webpackConfig = (tsconfigPath: string): Configuration => ({
     mode: 'development',
     module: {
         rules: [
@@ -10,7 +10,7 @@ export const webpackConfig: Configuration = {
                 use: {
                     loader: 'awesome-typescript-loader',
                     options: {
-                        configFileName: path.resolve(__dirname, './tsconfig.json')
+                        configFileName: tsconfigPath
                     }
                 }
             },
@@ -30,4 +30,4 @@ export const webpackConfig: Configuration = {
         extensions: ['.ts', '.tsx', '.js', '.css', '.mjs'],
     },
     devtool: 'inline-source-map',
-};
+});

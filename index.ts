@@ -7,7 +7,7 @@ import MemoryFS from 'memory-fs';
 import {cli, option} from 'typed-cli';
 import chalk from 'chalk';
 
-import {webpackConfig} from './configs/webpack.config';
+import {webpackConfig as defaultWebpackConfig} from './configs/webpack.config';
 
 const cwd = process.cwd();
 const entryTs = resolveFile([
@@ -40,8 +40,26 @@ const {options: cliOptions} = cli({
             .alias('p')
             .description('port of http server')
             .default(3333),
+        webpackConfigExt: option.string
+            .alias('wco')
+            .description('webpack configuration extension file'),
+        webpackConfig: option.string
+            .alias('wc')
+            .description('webpack configuration file'),
+        tsconfig: option.string
+            .alias('c')
+            .description('typescript configuration file')
+            .default(path.resolve(__dirname, './configs/tsconfig.json'))
     }
 });
+
+const baseWebpackCfg = cliOptions.webpackConfig
+    ? require(path.resolve(cwd, cliOptions.webpackConfig))
+    : defaultWebpackConfig(cliOptions.tsconfig);
+const webpackConfigExt = cliOptions.webpackConfigExt
+    ? require(path.resolve(cwd, cliOptions.webpackConfigExt))
+    : {};
+const webpackConfig = {...baseWebpackCfg, ...webpackConfigExt};
 
 console.log([
     '---',
@@ -50,7 +68,6 @@ console.log([
     `on ${chalk.bold(`http://localhost:${cliOptions.port}`)}`,
     '---',
 ].join('\n'));
-process.exit();
 
 const memFs = new MemoryFS();
 memFs.mkdirpSync('/build/');
