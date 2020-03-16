@@ -14,7 +14,8 @@
             "program": "${workspaceFolder}\\index.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ]
+            ],
+            "cwd": "C:\\Users\\user\\coding\\hv\\hv-components\\graph\\pg\\"
         }
     ]
 }

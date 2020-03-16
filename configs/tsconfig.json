@@ -6,5 +6,6 @@
         "esModuleInterop": true,
         "inlineSources": true,
         "sourceMap": true,
+        "jsx": "react"
     }
 }

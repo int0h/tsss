@@ -4,18 +4,63 @@ import url from 'url';
 import fs from 'fs';
 import webpack from 'webpack';
 import MemoryFS from 'memory-fs';
+import {cli, option} from 'typed-cli';
+import chalk from 'chalk';
+
 import {webpackConfig} from './configs/webpack.config';
+
+const cwd = process.cwd();
+const entryTs = resolveFile([
+    'index.ts',
+    'index.tsx',
+    'app.ts',
+    'app.tsx'
+].map(filename => `./${filename}`)) ?? 'index.ts';
+const entryHTML = resolveFile([
+    'index.html',
+    'index.htm',
+    'app.html',
+    'app.htm'
+].map(filename => `./${filename}`)) ?? 'index.html';
+
+const {options: cliOptions} = cli({
+    name: 'tsss',
+    description: 'Run it in any folder and it will serve `./index.html` in that folder as well as any other files except for `./index.js`'
+        + ' which is going to be the result of TypeScript compilation of `./index.ts` file.',
+    options: {
+        src: option.string
+            .alias('s')
+            .description('typescript source file name')
+            .default(entryTs),
+        html: option.string
+            .alias('h')
+            .description('html source file name')
+            .default(entryHTML),
+        port: option.number
+            .alias('p')
+            .description('port of http server')
+            .default(3333),
+    }
+});
+
+console.log([
+    '---',
+    `Building ${chalk.blue(path.relative(cwd, entryTs))}`,
+    `and serving ${chalk.red(path.relative(cwd, entryHTML))}`,
+    `on ${chalk.bold(`http://localhost:${cliOptions.port}`)}`,
+    '---',
+].join('\n'));
+process.exit();
 
 const memFs = new MemoryFS();
 memFs.mkdirpSync('/build/');
-const cwd = process.cwd();
 
 startWatch();
 
 http.createServer(async (req, res) => {
     setHeaders(res);
     if (req.url === '/') {
-        sendFile('./', res, cwd);
+        sendFile(cliOptions.html, res, cwd);
         return;
     }
     if (req.url === '/index.js') {
@@ -30,7 +75,16 @@ http.createServer(async (req, res) => {
         return;
     }
     serveStatic(req, res, cwd);
-}).listen(3333);
+}).listen(cliOptions.port);
+
+function resolveFile(variants: string[]): string | null {
+    for (const v of variants) {
+        if (fs.existsSync(v)) {
+            return v;
+        }
+    }
+    return null;
+}
 
 let buildResult: string = 'console.error("not built yet");';
 let buildErrors: any[] | null = null;
@@ -42,7 +96,7 @@ function startWatch() {
             filename: './index.js',
             path: '/build/'
         },
-        entry: path.resolve(cwd, 'index.ts')
+        entry: cliOptions.src
     });
     compiler.outputFileSystem = memFs;
     compiler.watch({}, (err, stats) => {
