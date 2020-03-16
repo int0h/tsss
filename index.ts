@@ -32,44 +32,8 @@ http.createServer(async (req, res) => {
     serveStatic(req, res, cwd);
 }).listen(3333);
 
-// async function buildOnDemand(): Promise<string> {
-//     return new Promise((resolve, reject) => {
-//         const compiler = webpack({
-//             ...webpackConfig,
-//             output: {
-//                 filename: './index.js',
-//                 path: '/build/'
-//             },
-//             entry: path.resolve(cwd, 'index.ts')
-//         });
-//         compiler.outputFileSystem = memFs;
-//         compiler.run((err, stats) => {
-//             if (err || stats.hasErrors()) {
-//               console.error(err, stats);
-//               reject(stats.toJson().errors);
-//               return;
-//             }
-//             const js = memFs.readFileSync('/build/index.js', 'utf-8');
-//             resolve(js);
-//         });
-//     });
-// }
-
 let buildResult: string = 'console.error("not built yet");';
 let buildErrors: any[] | null = null;
-
-// class InversePromise<T> {
-//     public resolve!: (val: T) => void;
-//     public reject!: (err: any) => void;
-//     public promise: Promise<T>;
-
-//     constructor() {
-//         this.promise = new Promise((resolve, reject) => {
-//             this.resolve = resolve;
-//             this.reject = reject;
-//         });
-//     }
-// }
 
 function startWatch() {
     const compiler = webpack({
