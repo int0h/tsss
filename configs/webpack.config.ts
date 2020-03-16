@@ -10,7 +10,7 @@ export const webpackConfig: Configuration = {
                 use: {
                     loader: 'awesome-typescript-loader',
                     options: {
-                        configFileName: path.resolve(__dirname, './cases/tsconfig.json')
+                        configFileName: path.resolve(__dirname, './tsconfig.json')
                     }
                 }
             },

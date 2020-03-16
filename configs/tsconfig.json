@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "es2018",
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "inlineSources": true,
+        "sourceMap": true,
+    }
+}
