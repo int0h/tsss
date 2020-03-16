@@ -116,7 +116,9 @@ function startWatch() {
         entry: cliOptions.src
     });
     compiler.outputFileSystem = memFs;
-    compiler.watch({}, (err, stats) => {
+    compiler.watch({
+        poll: 100
+    }, (err, stats) => {
         if (err || stats.hasErrors()) {
             if (err) {
                 console.error(err);
