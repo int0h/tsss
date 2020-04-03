@@ -9,6 +9,10 @@ import chalk from 'chalk';
 
 import {webpackConfig as defaultWebpackConfig} from './configs/webpack.config';
 
+const builtInHtmlPath = path.resolve(__dirname, 'built-in.html');
+
+const builtInName = '[built-in.html]';
+
 const cwd = process.cwd();
 const entryTs = resolveFile([
     'index.ts',
@@ -21,7 +25,7 @@ const entryHTML = resolveFile([
     'index.htm',
     'app.html',
     'app.htm'
-].map(filename => `./${filename}`)) ?? 'index.html';
+].map(filename => `./${filename}`)) ?? builtInName;
 
 const {options: cliOptions} = cli({
     name: 'tsss',
@@ -77,6 +81,11 @@ startWatch();
 http.createServer(async (req, res) => {
     setHeaders(res);
     if (req.url === '/') {
+        if (cliOptions.html === builtInName) {
+            res.setHeader('content-type', mimeMap['.html']);
+            res.end(fs.readFileSync(builtInHtmlPath, 'utf-8'));
+            return;
+        }
         sendFile(cliOptions.html, res, cwd);
         return;
     }
