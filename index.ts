@@ -69,7 +69,7 @@ console.log([
     '---',
     `Building ${chalk.blue(path.relative(cwd, entryTs))}`,
     `and serving ${chalk.red(path.relative(cwd, entryHTML))}`,
-    `on ${chalk.bold(`http://localhost:${cliOptions.port}`)}`,
+    `on ${chalk.bold(`http://localhost:${cliOptions.port} (http://0.0.0.0:${cliOptions.port})`)}`,
     '---',
 ].join('\n'));
 
@@ -101,7 +101,7 @@ http.createServer(async (req, res) => {
         return;
     }
     serveStatic(req, res, cwd);
-}).listen(cliOptions.port);
+}).listen(cliOptions.port, '0.0.0.0');
 
 function resolveFile(variants: string[]): string | null {
     for (const v of variants) {
@@ -186,7 +186,7 @@ function sendFile(pathname: string, res: http.ServerResponse, parentDir: string)
         return;
     }
     const ext = path.parse(pathname).ext || '.html';
-    const mimeType = mimeMap[ext as keyof typeof mimeMap] ?? 'text/plain';
+    const mimeType = mimeMap[ext as keyof typeof mimeMap] ?? 'application/octet-stream';
     if (fs.statSync(pathname).isDirectory()) {
         pathname += '/index' + ext;
     }

@@ -20,14 +20,14 @@
         "awesome-typescript-loader": "^5.2.1",
         "chalk": "^3.0.0",
         "css-loader": "^3.4.2",
+        "file-loader": "^6.0.0",
         "memory-fs": "^0.5.0",
         "source-map-loader": "^0.2.4",
         "style-loader": "^1.1.3",
         "tsconfig-paths-webpack-plugin": "^3.2.0",
         "typed-cli": "^0.2.6",
         "typescript": "^3.8.3",
-        "webpack": "^4.41.5",
-        "file-loader": "^6.0.0"
+        "webpack": "^4.41.5"
     },
     "bin": {
         "tsss": "./cli.js"
