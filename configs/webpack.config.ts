@@ -9,11 +9,13 @@ export const webpackConfig = (tsconfigPath: string): Configuration => ({
             {
                 test: /\.tsx?$/,
                 use: {
-                    loader: 'awesome-typescript-loader',
+                    loader: 'ts-loader',
                     options: {
-                        configFileName: tsconfigPath
+                        configFile: tsconfigPath,
                     }
-                }
+                },
+                exclude: /node_modules/,
+
             },
             {
                 test: /\.jsx?$/,
@@ -45,7 +47,7 @@ export const webpackConfig = (tsconfigPath: string): Configuration => ({
     },
     resolve: {
         plugins: [
-            new TsConfigPathsPlugin({configFile: tsconfigPath})
+            new TsConfigPathsPlugin({configFile: tsconfigPath, silent: true})
         ],
         extensions: ['.ts', '.tsx', '.js', '.css', '.mjs'],
     },

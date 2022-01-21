@@ -6,10 +6,14 @@ import webpack from 'webpack';
 import MemoryFS from 'memory-fs';
 import {cli, option} from 'typed-cli';
 import chalk from 'chalk';
+import packageJson from './package.json';
 
 import {webpackConfig as defaultWebpackConfig} from './configs/webpack.config';
 
+
 const builtInHtmlPath = path.resolve(__dirname, 'built-in.html');
+
+const builtInTSConfigPath = path.resolve(__dirname, './configs/tsconfig.json');
 
 const builtInName = '[built-in.html]';
 
@@ -26,6 +30,9 @@ const entryHTML = resolveFile([
     'app.html',
     'app.htm'
 ].map(filename => `./${filename}`)) ?? builtInName;
+const defaultTsconfigPath = resolveFile([
+    'tsconfig.json',
+].map(filename => `./${filename}`)) ?? builtInTSConfigPath;
 
 const {options: cliOptions} = cli({
     name: 'tsss',
@@ -53,7 +60,7 @@ const {options: cliOptions} = cli({
         tsconfig: option.string
             .alias('c')
             .description('typescript configuration file')
-            .default(path.resolve(__dirname, './configs/tsconfig.json'))
+            .default(defaultTsconfigPath)
     }
 });
 
@@ -69,7 +76,11 @@ console.log([
     '---',
     `Building ${chalk.blue(path.relative(cwd, entryTs))}`,
     `and serving ${chalk.red(path.relative(cwd, entryHTML))}`,
+    `tsconfig: ${chalk.green(defaultTsconfigPath === builtInTSConfigPath ? 'built-in' : path.relative(cwd, defaultTsconfigPath))}`,
     `on ${chalk.bold(`http://localhost:${cliOptions.port} (http://0.0.0.0:${cliOptions.port})`)}`,
+    '---',
+    `Typescript version: ${packageJson.dependencies.typescript}`,
+    `Webpack version: ${packageJson.dependencies.webpack}`,
     '---',
 ].join('\n'));
 
@@ -122,23 +133,24 @@ function startWatch() {
             filename: './index.js',
             path: '/build/'
         },
-        entry: cliOptions.src
+        entry: cliOptions.src,
     });
     compiler.outputFileSystem = memFs;
     compiler.watch({
         poll: 100
     }, (err, stats) => {
-        if (err || stats.hasErrors()) {
+        if (err || stats?.hasErrors()) {
             if (err) {
                 console.error(err);
             } else {
-                stats.toJson().errors.forEach(err => console.error(err));
+                (stats?.toJson().errors ?? []).forEach(err => console.error(err));
             }
-            buildErrors = stats.toJson().errors;
+            buildErrors = (stats?.toJson().errors ?? []);
             return;
         }
         const js = memFs.readFileSync('/build/index.js', 'utf-8');
         buildResult = js;
+        console.log('\n\nSuccessfully built!\n\n');
     });
 }
 
