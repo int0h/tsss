@@ -29,6 +29,7 @@
         "cli.js",
         "index.js",
         "configs/*.js",
-        "configs/*.json"
+        "configs/*.json",
+        "built-in.html"
     ]
 }
