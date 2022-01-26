@@ -103,15 +103,15 @@ async function main() {
     const webpackConfig = {...baseWebpackCfg, ...webpackConfigExt};
 
     console.log([
-        '---',
+        '---\n',
         `Building ${chalk.blue(path.relative(cwd, entryTs))}`,
         `and serving ${chalk.red(path.relative(cwd, entryHTML))}`,
         `tsconfig: ${chalk.green(defaultTsconfigPath === builtInTSConfigPath ? 'built-in' : path.relative(cwd, defaultTsconfigPath))}`,
         `on ${chalk.bold(`http://localhost:${cliOptions.port} (http://0.0.0.0:${cliOptions.port})`)}`,
-        '---',
+        '\n---\n',
         `Typescript version: ${packageJson.dependencies.typescript}`,
         `Webpack version: ${packageJson.dependencies.webpack}`,
-        '---',
+        '\n---',
     ].join('\n'));
 
     function setHeaders(res: http.ServerResponse) {
@@ -179,6 +179,17 @@ async function main() {
         sendFile(pathname, res, parentDir);
     }
 
+    function logErr(err: any) {
+        try {
+            // console.error(`${err.file}:${err.loc}`);
+            console.error(err.message);
+        } catch(e) {
+            console.error('failed to log');
+            console.error(e);
+            console.error(err);
+        }
+    }
+
     function startWatch() {
         const compiler = webpack({
             ...webpackConfig,
@@ -192,18 +203,28 @@ async function main() {
         compiler.watch({
             poll: 100
         }, (err, stats) => {
+            console.error('-'.repeat(50), '\n\n');
             if (err || stats?.hasErrors()) {
                 if (err) {
                     console.error(err);
                 } else {
-                    (stats?.toJson().errors ?? []).forEach(err => console.error(err));
+                    const errors = (stats?.toJson().errors ?? []);
+                    if (errors.length > 0) {
+                        console.error(chalk.redBright(`\n\n[${new Date().toLocaleTimeString()}]: build failed!\n\n`));
+                        console.error(chalk.redBright(`Found ${errors.length} errors:\n`));
+                        errors.forEach(err => {
+                            logErr(err);
+                            console.error('\n---\n');
+                        });
+                        console.error('-'.repeat(50), '\n\n');
+                    }
                 }
                 buildErrors = (stats?.toJson().errors ?? []);
                 return;
             }
             const js = memFs.readFileSync('/build/index.js', 'utf-8');
             buildResult = js;
-            console.log('\n\nSuccessfully built!\n\n');
+            console.log(chalk.greenBright(`\n\n[${new Date().toLocaleTimeString()}]: successfully built!\n\n`));
         });
     }
 

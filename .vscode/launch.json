@@ -14,7 +14,8 @@
             "program": "${workspaceFolder}/cli.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ]
+            ],
+            "cwd": "${workspaceFolder}/pg"
         }
     ]
 }
