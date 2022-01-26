@@ -11,11 +11,10 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\index.js",
+            "program": "${workspaceFolder}/cli.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ],
-            "cwd": "C:\\Users\\user\\coding\\hv\\hv-components\\graph\\pg\\"
+            ]
         }
     ]
 }
