@@ -68,6 +68,10 @@ async function main() {
                 .alias('s')
                 .description('typescript source file name')
                 .default(entryTs),
+            build: option.boolean
+                .alias('b')
+                .description('build staticly to fs without watch')
+                .default(false),
             html: option.string
                 .alias('h')
                 .description('html source file name')
@@ -195,11 +199,14 @@ async function main() {
             ...webpackConfig,
             output: {
                 filename: './index.js',
-                path: '/build/'
+                path: cliOptions.build ? process.cwd() : '/build/'
             },
             entry: cliOptions.src,
         });
-        compiler.outputFileSystem = memFs;
+        if (cliOptions.html === builtInName) {
+            fs.copyFileSync(builtInHtmlPath, path.resolve(process.cwd(), './index.html'));
+        }
+        compiler.outputFileSystem = cliOptions.build ? fs : memFs;
         compiler.watch({
             poll: 100
         }, (err, stats) => {
@@ -220,7 +227,14 @@ async function main() {
                     }
                 }
                 buildErrors = (stats?.toJson().errors ?? []);
+                if (cliOptions.build) {
+                    process.exit(1);
+                }
                 return;
+            }
+            if (cliOptions.build) {
+                console.log(chalk.greenBright(`\n\n[${new Date().toLocaleTimeString()}]: successfully built!\n\n`));
+                process.exit(0);
             }
             const js = memFs.readFileSync('/build/index.js', 'utf-8');
             buildResult = js;
